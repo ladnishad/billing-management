@@ -1,0 +1,5 @@
+netstat -a -n -o | find "3306"
+
+tasklist /fi "pid eq 5168"
+
+taskkill /F /PID 5168
