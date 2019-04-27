@@ -55,7 +55,7 @@ if($conn->connect_error){
     <button onclick="revealAdd()" class="button">Add Item</button>
     <input type="button" class="button" value="Update Item">
   </div>
-  <div id="addForm" class="formDiv">
+  <div id="addForm" class="formDiv" style="display: none">
     <form action="addItem.php" method="post">
     <label for="ItemName">Enter Item Name</label>
     <input type="text" id="itemname" name="itemname" placeholder="Eg: Eggs, Milk,.." required>
