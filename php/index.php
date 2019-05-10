@@ -17,6 +17,30 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 }
 
 
+if (isset($_POST['submitCommon'])) {
+	$ItemName = $_POST['itemlist'];
+	$ItemQuantity = $_POST['quantity'];
+
+	$date = date('m/d/y');
+	function convert($date)
+	{
+	  return str_replace("/", "", $date);
+	}
+
+	$cleanDate = convert($date);
+
+	$commGetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = $ItemName";
+	$commGetTotalCost = mysqli_query($conn,$commGetTotalCostQuery);
+	$TotalCost = 0.0000;
+	while ($TotalCostArray = mysqli_fetch_array($commGetTotalCost)){
+		$TotalCost = $TotalCostArray['ItemCost'];
+	}
+
+	//$commIndCost = $TotalCost/4;
+	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ($cleanDate, $ItemName, $TotalCost, $TotalCost, $TotalCost, $TotalCost, $ItemQuantity, $TotalCost);";
+}
+
+
 ?>
 
 
@@ -47,6 +71,7 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 			function addElement(){
 				document.getElementById("userselect").style.display = "inline";
         var text = document.getElementById('users');
+				var check = document.getElementById('checkbDivide');
         var num = parseInt(text.value);
 
         for (var i = 0; i < num; i++) {
@@ -55,16 +80,35 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
             optionArray.push('<?php echo $val; ?>');
             <?php } ?>
 
-          	var selectList = document.createElement("select");
-          	selectList.setAttribute("id"+i, "mySelect"+i);
-          	itemTypePrivate.appendChild(selectList);
+						var selectList = document.createElement("select");
+						selectList.setAttribute("id"+i, "mySelect"+i);
+						itemTypePrivate.appendChild(selectList);
 
-          	for (var j = 0; j < optionArray.length; j++) {
-            	var option = document.createElement("option");
-            	option.setAttribute("value",optionArray[j]);
-            	option.text = optionArray[j];
-            	selectList.appendChild(option);
-          	}
+						if (!check.checked) {
+							var qtyLabel = document.createElement("label");
+							qtyLabel.id = "qtyLabel"+i;
+							qtyLabel.innerHTML = "Enter Quantity: ";
+							itemTypePrivate.appendChild(qtyLabel);
+							var qtyText = document.createElement("input");
+							qtyText.Type = "text";
+							qtyText.id = "qtyText"+i;
+							qtyText.class = "inputs";
+							qtyText.placeholder = "Ex: 1,2,3,...";
+							itemTypePrivate.appendChild(qtyText);
+							linebreak = document.createElement("br");
+							itemTypePrivate.appendChild(linebreak);
+						}
+						else {
+							linebreak = document.createElement("br");
+							itemTypePrivate.appendChild(linebreak);
+						}
+
+						for (var j = 0; j < optionArray.length; j++) {
+							var option = document.createElement("option");
+							option.setAttribute("value",optionArray[j]);
+							option.text = optionArray[j];
+							selectList.appendChild(option);
+						}
         	}
       	}
 
@@ -100,8 +144,8 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
   	$selectItemName = "SELECT ItemName FROM items";
   	$selectItemNameresult = mysqli_query($conn, $selectItemName);
 
-  	echo "<input list='itemlist' type='text'>";
-  	echo "<datalist id='itemlist'>";
+  	echo "<input type='text' name = 'itemlist' list='itemlist'>";
+  	echo "<datalist id='itemlist' name='itemList'>";
   	while ($selectItemNameresultrow = mysqli_fetch_array($selectItemNameresult)) {
     	echo "<option>".$selectItemNameresultrow{'ItemName'}."</option>";
   	}
@@ -116,19 +160,29 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 		</select>
 
 		<div id="itemTypeCommon" style="display: none">
+			<form action="index.php" method="post">
 			<label for="itemQuantity">Select quantity: </label>
-			<input type="text" name="quantity" placeholder="Ex: 2,3,4,..." class="inputs"><br>
+			<input type="text" id="quantity" name="quantity" placeholder="Ex: 2,3,4,..." class="inputs"><br>
+			<input type="submit" name="submitCommon" value="Add to bill" class="button"><br>
+		</form>
 		</div>
 
 		<div id="itemTypePrivate" style="display: none">
+			<label for="NumUsersQuant">Total Quantity:  </label>
+			<input type="text" id = "usersQuant" name="usersQuant" placeholder="Ex: 1,2,3,4,..." class="inputs"><br>
+
 			<label for="NumUsers">Number of people:  </label>
 			<input type="text" id = "users" name="users" placeholder="Ex: 1,2,3,4,..." class="inputs">
-			<input type="submit" name="addusers" onclick="addElement()"value="Add Users" id="addusers" class="button"><br>
+			<input type="submit" name="addusers" onclick="addElement()"value="Add Users" id="addusers" class="button">
+
+			<input type="checkbox" id="checkbDivide" cname="equalDivide" value="divide"> Divide Equally<br>
 			<label for="userselect" id="userselect" style="display: none">Select User(s): </label>
+
+			<input type="submit" name="submitPrivate" value="Add to bill" class="button"><br>
+			</form>
 		</div>
 
 
-  	<input type="submit" name="submit" value="Add to bill" class="button"><br>
-  	</div>
+
 	</body>
 </html>

@@ -17,7 +17,7 @@ if (isset($_POST['submit']))
 	$ItemCost = trim($_POST['itemcost']);
 	$Comments = trim($_POST['itemcom']);
 
-	$sql = "INSERT INTO Items (ItemID,ItemName,ItemCost,ItemComm) VALUES (NULL,'$ItemName','$ItemCost','$Comments')";
+	$sql = "INSERT INTO Items (ItemID,ItemName,ItemCost,ItemComm) VALUES (NULL,'{$ItemName}','$ItemCost','$Comments')";
   $insert = $conn->query($sql);
   if ($insert)
   {
