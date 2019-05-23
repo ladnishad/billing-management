@@ -18,7 +18,8 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 
 
 if (isset($_POST['submitCommon'])) {
-	$ItemName = $_POST['itemlist'];
+	$ItemName = (isset($_POST['itemlistText']) ? $_POST['itemlistText'] : null);
+	$NameItem = $_POST['itemlistText'];
 	$ItemQuantity = $_POST['quantity'];
 
 	$date = date('m/d/y');
@@ -29,15 +30,28 @@ if (isset($_POST['submitCommon'])) {
 
 	$cleanDate = convert($date);
 
-	$commGetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = $ItemName";
+
+
+	$commGetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = '$ItemName'";
 	$commGetTotalCost = mysqli_query($conn,$commGetTotalCostQuery);
+
+	if (!$commGetTotalCost) {
+    printf("Error: %s\n", mysqli_error($conn));
+    exit();
+}
+
 	$TotalCost = 0.0000;
 	while ($TotalCostArray = mysqli_fetch_array($commGetTotalCost)){
 		$TotalCost = $TotalCostArray['ItemCost'];
 	}
 
-	//$commIndCost = $TotalCost/4;
-	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ($cleanDate, $ItemName, $TotalCost, $TotalCost, $TotalCost, $TotalCost, $ItemQuantity, $TotalCost);";
+	$commIndCost = ($TotalCost*$ItemQuantity)/4;
+	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$commIndCost', '$commIndCost', '$commIndCost', '$commIndCost', '$ItemQuantity', '$TotalCost');";
+	$execCommQuery = mysqli_query($conn,$CommQuery);
+	if (!$execCommQuery) {
+    printf("Error: %s\n", mysqli_error($conn));
+    exit();
+}
 }
 
 
@@ -139,18 +153,6 @@ if (isset($_POST['submitCommon'])) {
 
 		<br><br>
 
-		<label for="selectItem">Item Name: </label>
-  	<?php
-  	$selectItemName = "SELECT ItemName FROM items";
-  	$selectItemNameresult = mysqli_query($conn, $selectItemName);
-
-  	echo "<input type='text' name = 'itemlist' list='itemlist'>";
-  	echo "<datalist id='itemlist' name='itemList'>";
-  	while ($selectItemNameresultrow = mysqli_fetch_array($selectItemNameresult)) {
-    	echo "<option>".$selectItemNameresultrow{'ItemName'}."</option>";
-  	}
-  	echo "</datalist>";
-  	?>
 
 		<label for="itemType">Item Type: </label>
 		<select  name="itemtype" onchange="changeFunc(value);">
@@ -161,6 +163,18 @@ if (isset($_POST['submitCommon'])) {
 
 		<div id="itemTypeCommon" style="display: none">
 			<form action="index.php" method="post">
+				<label for="selectItem">Item Name: </label>
+		  	<?php
+		  	$selectItemName = "SELECT ItemName FROM items";
+		  	$selectItemNameresult = mysqli_query($conn, $selectItemName);
+
+		  	echo "<input type='text' name = 'itemlistText' id='itemlistText' list='itemlist'>";
+		  	echo "<datalist id='itemlist' name='itemList'>";
+		  	while ($selectItemNameresultrow = mysqli_fetch_array($selectItemNameresult)) {
+		    	echo "<option>".$selectItemNameresultrow{'ItemName'}."</option>";
+		  	}
+		  	echo "</datalist>";
+		  	?><br>
 			<label for="itemQuantity">Select quantity: </label>
 			<input type="text" id="quantity" name="quantity" placeholder="Ex: 2,3,4,..." class="inputs"><br>
 			<input type="submit" name="submitCommon" value="Add to bill" class="button"><br>
@@ -181,6 +195,41 @@ if (isset($_POST['submitCommon'])) {
 			<input type="submit" name="submitPrivate" value="Add to bill" class="button"><br>
 			</form>
 		</div>
+
+		<table class="center">
+		    <thead>
+		    <tr>
+		    			<th scope="col">Bill#</th>
+		          <th scope="col" colspan="2">Item</th>
+		          <th scope="col">Harshit</th>
+							<th scope="col">Harish</th>
+							<th scope="col">Deep</th>
+							<th scope="col">Nishad</th>
+							<th scope="col">Qty</th>
+							<th scope="col">Total Cost</th>
+		      </tr>
+		      </thead>
+		      <tbody>
+		      <?php
+		      $retrieveBill = "SELECT BillsID, BillItem, HarshitCost, HarishCost,DeepCost,NishadCost,TotalQty,TotalCost FROM Bills";
+		      $billsresult = mysqli_query($conn,$retrieveBill);
+		      $num_rows = mysqli_num_rows($billsresult);
+
+		        while ($row = mysqli_fetch_array($billsresult)):; ?>
+		        <tr>
+		          <td class="item-id"><?php echo $row['BillsID'];?></td>
+		          <td colspan="2"><strong class="item-name"><?php echo $row['BillItem'];?></strong></td>
+		          <td class="item-price"><?php echo "$".$row['HarshitCost'];?></td>
+							<td class="item-price"><?php echo "$".$row['HarishCost'];?></td>
+							<td class="item-price"><?php echo "$".$row['DeepCost'];?></td>
+							<td class="item-price"><?php echo "$".$row['NishadCost'];?></td>
+							<td class="item-price"><?php echo $row['TotalQty'];?></td>
+							<td class="item-price"><?php echo "$".$row['TotalCost'];?></td>
+		        </tr>
+		      <?php endwhile; ?>
+		      </tbody>
+		    </table>
+
 
 
 
