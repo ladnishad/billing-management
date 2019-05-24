@@ -46,7 +46,8 @@ if (isset($_POST['submitCommon'])) {
 	}
 
 	$commIndCost = ($TotalCost*$ItemQuantity)/4;
-	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$commIndCost', '$commIndCost', '$commIndCost', '$commIndCost', '$ItemQuantity', '$TotalCost');";
+	$SumTotalCost = $TotalCost*$ItemQuantity;
+	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$commIndCost', '$commIndCost', '$commIndCost', '$commIndCost', '$ItemQuantity', '$SumTotalCost');";
 	$execCommQuery = mysqli_query($conn,$CommQuery);
 	if (!$execCommQuery) {
     printf("Error: %s\n", mysqli_error($conn));
@@ -211,7 +212,7 @@ if (isset($_POST['submitCommon'])) {
 		      </thead>
 		      <tbody>
 		      <?php
-		      $retrieveBill = "SELECT BillsID, BillItem, HarshitCost, HarishCost,DeepCost,NishadCost,TotalQty,TotalCost FROM Bills";
+		      $retrieveBill = "SELECT BillsID, BillItem, HarshitCost, HarishCost, DeepCost, NishadCost,TotalQty,TotalCost FROM Bills";
 		      $billsresult = mysqli_query($conn,$retrieveBill);
 		      $num_rows = mysqli_num_rows($billsresult);
 
@@ -226,7 +227,28 @@ if (isset($_POST['submitCommon'])) {
 							<td class="item-price"><?php echo $row['TotalQty'];?></td>
 							<td class="item-price"><?php echo "$".$row['TotalCost'];?></td>
 		        </tr>
-		      <?php endwhile; ?>
+					<?php endwhile; ?>
+					</tbody>
+				</table>
+
+				<table class="center">
+					<tbody>
+						<?php
+			      $retrieveTotals = "SELECT SUM(HarshitCost) as HarshitTotal, SUM(HarishCost) as HarishTotal, SUM(DeepCost) as DeepTotal, SUM(NishadCost) as NishadTotal, SUM(TotalCost) as Total FROM Bills";
+			      $totalsresult = mysqli_query($conn,$retrieveTotals);
+			      $num_rows = mysqli_num_rows($totalsresult);
+
+			        while ($row = mysqli_fetch_array($totalsresult)):; ?>
+						<tr>
+							<td colspan="3" style="width:206px"><strong class="item-name"><?php echo "Total";?></strong></td>
+							<td class="item-price"><strong><?php echo "$".$row['HarshitTotal'];?></strong></td>
+							<td class="item-price"><strong><?php echo "$".$row['HarishTotal'];?></strong></td>
+							<td class="item-price"><strong><?php echo "$".$row['DeepTotal'];?></strong></td>
+							<td class="item-price"><strong><?php echo "$".$row['NishadTotal'];?></strong></td>
+							<td colspan="2" style="width:122px" class="item-price"><strong><?php echo "$".$row['Total'];?></strong></td>
+						</tr>
+
+					<?php endwhile; ?>
 		      </tbody>
 		    </table>
 
