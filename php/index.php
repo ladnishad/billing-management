@@ -1,9 +1,9 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
+$servername = "";
+$username = "";
 $pwd = "";
-$dbname = "bills_management";
+$dbname = "";
 
 $conn = new mysqli($servername,$username,$pwd,$dbname);
 if($conn->connect_error){
@@ -18,7 +18,7 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 
 if (isset($_POST['submitBill'])) {
 
-	$TransferQuery = "INSERT INTO bills_management.billslist (SELECT * FROM bills_management.bills);";
+	$TransferQuery = "INSERT INTO billslist (SELECT * FROM bills);";
 	$ExecTransferQuery = mysqli_query($conn,$TransferQuery);
 
 	if (!$ExecTransferQuery) {
@@ -26,7 +26,7 @@ if (isset($_POST['submitBill'])) {
     exit();
 }
 
-	$clearBillsQuery = "DELETE FROM bills_management.bills; ";
+	$clearBillsQuery = "DELETE FROM bills; ";
 	$ExecclearBillsQuery = mysqli_query($conn,$clearBillsQuery);
 	if (!$ExecclearBillsQuery) {
 		printf("Error: %s\n", mysqli_error($conn));
@@ -47,7 +47,7 @@ if (isset($_POST['submitPrivate'])) {
 
 	$cleanDate = convert($date);
 
-	$GetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = '$ItemName'";
+	$GetTotalCostQuery = "SELECT ItemCost FROM items where ItemName = '$ItemName'";
 	$GetTotalCost = mysqli_query($conn,$GetTotalCostQuery);
 
 	if (!$GetTotalCost) {
@@ -81,7 +81,7 @@ if (isset($_POST['submitPrivate'])) {
 
 		$Total = $Cost * $ItemQuantity;
 
-		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, $User3, $User4, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$User4Cost', '$ItemQuantity', '$Total');";
+		$InsertQuery = "INSERT INTO bills (`BillsID`, `BillItem`, $User1, $User2, $User3, $User4, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$User4Cost', '$ItemQuantity', '$Total');";
 		$execQuery = mysqli_query($conn,$InsertQuery);
 		if (!$execQuery) {
 	    printf("Error: %s\n", mysqli_error($conn));
@@ -105,7 +105,7 @@ if (isset($_POST['submitPrivate'])) {
 
 		$Total = $Cost * $ItemQuantity;
 
-		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, $User3, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$ItemQuantity', '$Total');";
+		$InsertQuery = "INSERT INTO bills (`BillsID`, `BillItem`, $User1, $User2, $User3, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$ItemQuantity', '$Total');";
 		$execQuery = mysqli_query($conn,$InsertQuery);
 		if (!$execQuery) {
 	    printf("Error: %s\n", mysqli_error($conn));
@@ -126,7 +126,7 @@ if (isset($_POST['submitPrivate'])) {
 
 		$Total = $Cost * $ItemQuantity;
 
-		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$ItemQuantity', '$Total');";
+		$InsertQuery = "INSERT INTO bills (`BillsID`, `BillItem`, $User1, $User2, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$ItemQuantity', '$Total');";
 		$execQuery = mysqli_query($conn,$InsertQuery);
 		if (!$execQuery) {
 	    printf("Error: %s\n", mysqli_error($conn));
@@ -144,7 +144,7 @@ if (isset($_POST['submitPrivate'])) {
 
 		$Total = $Cost * $ItemQuantity;
 
-		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$ItemQuantity', '$Total');";
+		$InsertQuery = "INSERT INTO bills (`BillsID`, `BillItem`, $User1, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$ItemQuantity', '$Total');";
 		$execQuery = mysqli_query($conn,$InsertQuery);
 		if (!$execQuery) {
 	    printf("Error: %s\n", mysqli_error($conn));
@@ -174,7 +174,7 @@ if (isset($_POST['submitCommon'])) {
 
 	$cleanDate = convert($date);
 
-	$commGetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = '$ItemName'";
+	$commGetTotalCostQuery = "SELECT ItemCost FROM items where ItemName = '$ItemName'";
 	$commGetTotalCost = mysqli_query($conn,$commGetTotalCostQuery);
 
 	if (!$commGetTotalCost) {
@@ -189,7 +189,7 @@ if (isset($_POST['submitCommon'])) {
 
 	$commIndCost = ($TotalCost*$ItemQuantity)/4;
 	$SumTotalCost = $TotalCost*$ItemQuantity;
-	$CommQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$commIndCost', '$commIndCost', '$commIndCost', '$commIndCost', '$ItemQuantity', '$SumTotalCost');";
+	$CommQuery = "INSERT INTO bills (`BillsID`, `BillItem`, `HarshitCost`, `HarishCost`, `DeepCost`, `NishadCost`, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$commIndCost', '$commIndCost', '$commIndCost', '$commIndCost', '$ItemQuantity', '$SumTotalCost');";
 	$execCommQuery = mysqli_query($conn,$CommQuery);
 	if (!$execCommQuery) {
     printf("Error: %s\n", mysqli_error($conn));
