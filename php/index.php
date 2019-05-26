@@ -1,9 +1,9 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
+$servername = "";
+$username = "";
 $pwd = "";
-$dbname = "bills_management";
+$dbname = "";
 
 $conn = new mysqli($servername,$username,$pwd,$dbname);
 if($conn->connect_error){
@@ -14,6 +14,133 @@ $getUsername = "SELECT username from users";
 $getUsernamequery = mysqli_query($conn,$getUsername);
 while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 		$names[] = $getUsernamerow['username'];
+}
+
+if (isset($_POST['submitPrivate'])) {
+	// code...
+	$ItemName = (isset($_POST['itemlistText']) ? $_POST['itemlistText'] : null);
+	$NameItem = $_POST['itemlistText'];
+	$ItemQuantity = $_POST['usersQuant'];
+
+	$date = date('m/d/y');
+	function convert($date)
+	{
+	  return str_replace("/", "", $date);
+	}
+
+	$cleanDate = convert($date);
+
+	$GetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = '$ItemName'";
+	$GetTotalCost = mysqli_query($conn,$GetTotalCostQuery);
+
+	if (!$GetTotalCost) {
+    printf("Error: %s\n", mysqli_error($conn));
+    exit();
+}
+
+	$Cost = 0.0000;
+	while ($TotalCostArray = mysqli_fetch_array($GetTotalCost)){
+		$Cost = $TotalCostArray['ItemCost'];
+	}
+
+	$noOfUsers = $_POST['users'];
+
+	if ($noOfUsers == '4') {
+		$User1 = (isset($_POST['mySelect0']) ? $_POST['mySelect0'] : null).'Cost';
+		$User2 = (isset($_POST['mySelect1']) ? $_POST['mySelect1'] : null).'Cost';
+		$User3 = (isset($_POST['mySelect2']) ? $_POST['mySelect2'] : null).'Cost';
+		$User4 = (isset($_POST['mySelect3']) ? $_POST['mySelect3'] : null).'Cost';
+
+
+		$User1Qty =(isset($_POST['qtyText0']) ? $_POST['qtyText0'] : null);
+		$User2Qty = (isset($_POST['qtyText1']) ? $_POST['qtyText1'] : null);
+		$User3Qty = (isset($_POST['qtyText2']) ? $_POST['qtyText2'] : null);
+		$User4Qty = (isset($_POST['qtyText3']) ? $_POST['qtyText3'] : null);
+
+		$User1Cost = $Cost * $User1Qty;
+		$User2Cost = $Cost * $User2Qty;
+		$User3Cost = $Cost * $User3Qty;
+		$User4Cost = $Cost * $User4Qty;
+
+		$Total = $Cost * $ItemQuantity;
+
+		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, $User3, $User4, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$User4Cost', '$ItemQuantity', '$Total');";
+		$execQuery = mysqli_query($conn,$InsertQuery);
+		if (!$execQuery) {
+	    printf("Error: %s\n", mysqli_error($conn));
+	    exit();
+	}
+
+	}
+
+	else if ($noOfUsers == '3') {
+		$User1 = (isset($_POST['mySelect0']) ? $_POST['mySelect0'] : null).'Cost';
+		$User2 = (isset($_POST['mySelect1']) ? $_POST['mySelect1'] : null).'Cost';
+		$User3 = (isset($_POST['mySelect2']) ? $_POST['mySelect2'] : null).'Cost';
+
+		$User1Qty =(isset($_POST['qtyText0']) ? $_POST['qtyText0'] : null);
+		$User2Qty = (isset($_POST['qtyText1']) ? $_POST['qtyText1'] : null);
+		$User3Qty = (isset($_POST['qtyText2']) ? $_POST['qtyText2'] : null);
+
+		$User1Cost = $Cost * $User1Qty;
+		$User2Cost = $Cost * $User2Qty;
+		$User3Cost = $Cost * $User3Qty;
+
+		$Total = $Cost * $ItemQuantity;
+
+		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, $User3, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$User3Cost', '$ItemQuantity', '$Total');";
+		$execQuery = mysqli_query($conn,$InsertQuery);
+		if (!$execQuery) {
+	    printf("Error: %s\n", mysqli_error($conn));
+	    exit();
+	}
+
+	}
+
+	else if ($noOfUsers == '2') {
+		$User1 = (isset($_POST['mySelect0']) ? $_POST['mySelect0'] : null).'Cost';
+		$User2 = (isset($_POST['mySelect1']) ? $_POST['mySelect1'] : null).'Cost';
+
+		$User1Qty =(isset($_POST['qtyText0']) ? $_POST['qtyText0'] : null);
+		$User2Qty = (isset($_POST['qtyText1']) ? $_POST['qtyText1'] : null);
+
+		$User1Cost = $Cost * $User1Qty;
+		$User2Cost = $Cost * $User2Qty;
+
+		$Total = $Cost * $ItemQuantity;
+
+		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, $User2, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$User2Cost', '$ItemQuantity', '$Total');";
+		$execQuery = mysqli_query($conn,$InsertQuery);
+		if (!$execQuery) {
+	    printf("Error: %s\n", mysqli_error($conn));
+	    exit();
+	}
+
+	}
+
+	else if ($noOfUsers == '1') {
+		$User1 = (isset($_POST['mySelect0']) ? $_POST['mySelect0'] : null).'Cost';
+
+		$User1Qty =(isset($_POST['qtyText0']) ? $_POST['qtyText0'] : null);
+
+		$User1Cost = $Cost * $User1Qty;
+
+		$Total = $Cost * $ItemQuantity;
+
+		$InsertQuery = "INSERT INTO bills_management.bills (`BillsID`, `BillItem`, $User1, `TotalQty`, `TotalCost`) VALUES ('$cleanDate', '$ItemName', '$User1Cost', '$ItemQuantity', '$Total');";
+		$execQuery = mysqli_query($conn,$InsertQuery);
+		if (!$execQuery) {
+	    printf("Error: %s\n", mysqli_error($conn));
+	    exit();
+	}
+
+	}
+
+	else{
+
+	}
+
+
 }
 
 
@@ -29,8 +156,6 @@ if (isset($_POST['submitCommon'])) {
 	}
 
 	$cleanDate = convert($date);
-
-
 
 	$commGetTotalCostQuery = "SELECT ItemCost FROM bills_management.items where ItemName = '$ItemName'";
 	$commGetTotalCost = mysqli_query($conn,$commGetTotalCostQuery);
@@ -83,49 +208,7 @@ if (isset($_POST['submitCommon'])) {
 	      }
 			}
 
-			function addElement(){
-				document.getElementById("userselect").style.display = "inline";
-        var text = document.getElementById('users');
-				var check = document.getElementById('checkbDivide');
-        var num = parseInt(text.value);
 
-        for (var i = 0; i < num; i++) {
-          var optionArray = new Array();
-          <?php foreach($names as $val){ ?>
-            optionArray.push('<?php echo $val; ?>');
-            <?php } ?>
-
-						var selectList = document.createElement("select");
-						selectList.setAttribute("id"+i, "mySelect"+i);
-						itemTypePrivate.appendChild(selectList);
-
-						if (!check.checked) {
-							var qtyLabel = document.createElement("label");
-							qtyLabel.id = "qtyLabel"+i;
-							qtyLabel.innerHTML = "Enter Quantity: ";
-							itemTypePrivate.appendChild(qtyLabel);
-							var qtyText = document.createElement("input");
-							qtyText.Type = "text";
-							qtyText.id = "qtyText"+i;
-							qtyText.class = "inputs";
-							qtyText.placeholder = "Ex: 1,2,3,...";
-							itemTypePrivate.appendChild(qtyText);
-							linebreak = document.createElement("br");
-							itemTypePrivate.appendChild(linebreak);
-						}
-						else {
-							linebreak = document.createElement("br");
-							itemTypePrivate.appendChild(linebreak);
-						}
-
-						for (var j = 0; j < optionArray.length; j++) {
-							var option = document.createElement("option");
-							option.setAttribute("value",optionArray[j]);
-							option.text = optionArray[j];
-							selectList.appendChild(option);
-						}
-        	}
-      	}
 
 			function getValue(){
         var checks = document.getElementsByClassName('checks');
@@ -183,21 +266,76 @@ if (isset($_POST['submitCommon'])) {
 		</div>
 
 		<div id="itemTypePrivate" style="display: none">
+			<form id="personalform" action="index.php" method="post">
+			<label for="selectItem">Item Name: </label>
+			<?php
+			$selectItemName = "SELECT ItemName FROM items";
+			$selectItemNameresult = mysqli_query($conn, $selectItemName);
+
+			echo "<input type='text' name = 'itemlistText' id='itemlistText' list='itemlist'>";
+			echo "<datalist id='itemlist' name='itemList'>";
+			while ($selectItemNameresultrow = mysqli_fetch_array($selectItemNameresult)) {
+				echo "<option>".$selectItemNameresultrow{'ItemName'}."</option>";
+			}
+			echo "</datalist>";
+			?><br>
 			<label for="NumUsersQuant">Total Quantity:  </label>
 			<input type="text" id = "usersQuant" name="usersQuant" placeholder="Ex: 1,2,3,4,..." class="inputs"><br>
 
 			<label for="NumUsers">Number of people:  </label>
 			<input type="text" id = "users" name="users" placeholder="Ex: 1,2,3,4,..." class="inputs">
-			<input type="submit" name="addusers" onclick="addElement()"value="Add Users" id="addusers" class="button">
+			<input type="button" name="addusers" onclick="addElement()"value="Add Users" id="addusers" class="button"><br>
 
-			<input type="checkbox" id="checkbDivide" cname="equalDivide" value="divide"> Divide Equally<br>
+			<script type="text/javascript">
+			function addElement(){
+				document.getElementById("userselect").style.display = "inline";
+				var text = document.getElementById('users');
+				var num = parseInt(text.value);
+
+				for (var i = 0; i < num; i++) {
+					var optionArray = new Array();
+					<?php foreach($names as $val){ ?>
+						optionArray.push('<?php echo $val; ?>');
+						<?php } ?>
+
+						var selectList = document.createElement("select");
+						selectList.setAttribute("id", "mySelect"+i);
+						selectList.setAttribute("name", "mySelect"+i);
+						personalform.appendChild(selectList);
+
+							var qtyLabel = document.createElement("label");
+							qtyLabel.id = "qtyLabel"+i;
+							qtyLabel.innerHTML = "Enter Quantity: ";
+							personalform.appendChild(qtyLabel);
+							var qtyText = document.createElement("input");
+							qtyText.Type = "text";
+							qtyText.id = "qtyText"+i;
+							qtyText.name = "qtyText"+i;
+							qtyText.class = "inputs";
+							qtyText.placeholder = "Ex: 1,2,3,...";
+							personalform.appendChild(qtyText);
+							linebreak = document.createElement("br");
+							personalform.appendChild(linebreak);
+
+						for (var j = 0; j < optionArray.length; j++) {
+							var option = document.createElement("option");
+							option.setAttribute("value",optionArray[j]);
+							option.text = optionArray[j];
+							selectList.appendChild(option);
+						}
+					}
+				}
+			</script>
+
 			<label for="userselect" id="userselect" style="display: none">Select User(s): </label>
 
 			<input type="submit" name="submitPrivate" value="Add to bill" class="button"><br>
+
+
 			</form>
 		</div>
 
-		<table class="center">
+		<table class="center" style="table-layout:fixed">
 		    <thead>
 		    <tr>
 		    			<th scope="col">Bill#</th>
@@ -231,7 +369,7 @@ if (isset($_POST['submitCommon'])) {
 					</tbody>
 				</table>
 
-				<table class="center">
+				<table class="center" style="table-layout:fixed">
 					<tbody>
 						<?php
 			      $retrieveTotals = "SELECT SUM(HarshitCost) as HarshitTotal, SUM(HarishCost) as HarishTotal, SUM(DeepCost) as DeepTotal, SUM(NishadCost) as NishadTotal, SUM(TotalCost) as Total FROM Bills";
