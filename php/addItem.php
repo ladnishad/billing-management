@@ -1,9 +1,9 @@
 <?php
 
-$servername = "";
-$username = "";
+$servername = "localhost";
+$username = "root";
 $pwd = "";
-$dbname = "";
+$dbname = "bills_management";
 
 $conn = new mysqli($servername,$username,$pwd,$dbname);
 if($conn->connect_error){
