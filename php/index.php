@@ -1,9 +1,9 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
+$servername = "";
+$username = "";
 $pwd = "";
-$dbname = "bills_management";
+$dbname = "";
 
 $conn = new mysqli($servername,$username,$pwd,$dbname);
 if($conn->connect_error){
@@ -14,6 +14,15 @@ $getUsername = "SELECT username from users";
 $getUsernamequery = mysqli_query($conn,$getUsername);
 while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 		$names[] = $getUsernamerow['username'];
+}
+
+if (isset($_POST['deleteBill'])) {
+	$clearBillsQuery = "DELETE FROM bills; ";
+	$ExecclearBillsQuery = mysqli_query($conn,$clearBillsQuery);
+	if (!$ExecclearBillsQuery) {
+		printf("Error: %s\n", mysqli_error($conn));
+		exit();
+	}
 }
 
 if (isset($_POST['submitBill'])) {
@@ -390,8 +399,12 @@ if (isset($_POST['submitCommon'])) {
 					<?php endwhile; ?>
 		      </tbody>
 		    </table>
+
+				<div class="btn_center">
 				<form action ="index.php" method="post">
 						<input type="submit" name="submitBill" value="Submit Bill" class="button">
+						<input type="submit" name="deleteBill" value="Clear Bill" class="button">
 				</form>
+				</div>
 	</body>
 </html>
