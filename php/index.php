@@ -16,6 +16,23 @@ while($getUsernamerow = mysqli_fetch_array($getUsernamequery)){
 		$names[] = $getUsernamerow['username'];
 }
 
+if (isset($_POST['submitBill'])) {
+
+	$TransferQuery = "INSERT INTO bills_management.billslist (SELECT * FROM bills_management.bills);";
+	$ExecTransferQuery = mysqli_query($conn,$TransferQuery);
+
+	if (!$ExecTransferQuery) {
+    printf("Error: %s\n", mysqli_error($conn));
+    exit();
+}
+
+	$clearBillsQuery = "DELETE FROM bills_management.bills; ";
+	$ExecclearBillsQuery = mysqli_query($conn,$clearBillsQuery);
+	if (!$ExecclearBillsQuery) {
+		printf("Error: %s\n", mysqli_error($conn));
+		exit();
+	}
+}
 if (isset($_POST['submitPrivate'])) {
 	// code...
 	$ItemName = (isset($_POST['itemlistText']) ? $_POST['itemlistText'] : null);
@@ -207,22 +224,6 @@ if (isset($_POST['submitCommon'])) {
 					divPrivate.style.display = "none";
 	      }
 			}
-
-
-
-			function getValue(){
-        var checks = document.getElementsByClassName('checks');
-        var str = '';
-        let num = 0;
-
-        for (var i = 0; i < 4; i++) {
-          if (checks[i].checked === true) {
-            num += parseInt(checks[i].value);
-          }
-        }
-        alert(num);
-        console.log(num);
-      }
 		</script>
     <title>WELCOME</title>
   </head>
@@ -232,7 +233,7 @@ if (isset($_POST['submitCommon'])) {
 
     <div class="btn_center">
     <a href="../php/Items.php" class="button" >View Items</a>
-		<a href="../php/Items.php" class="button" >View Past Bills</a>
+		<a href="../php/ViewBills.php" class="button" >View Past Bills</a>
   	</div>
 
 		<br><br>
@@ -389,9 +390,8 @@ if (isset($_POST['submitCommon'])) {
 					<?php endwhile; ?>
 		      </tbody>
 		    </table>
-
-
-
-
+				<form action ="index.php" method="post">
+						<input type="submit" name="submitBill" value="Submit Bill" class="button">
+				</form>
 	</body>
 </html>

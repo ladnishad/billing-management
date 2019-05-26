@@ -58,10 +58,10 @@ if($conn->connect_error){
   <div id="addForm" class="formDiv" style="display: none">
     <form action="addItem.php" method="post">
     <label for="ItemName">Enter Item Name</label>
-    <input type="text" id="itemname" name="itemname" placeholder="Eg: Eggs, Milk,.." required>
+    <input type="text" id="itemname" name="itemname" placeholder="Eg: Eggs, Milk,.." required><br>
 
     <label for="ItemCost">Enter Cost of the item</label>
-    <input type="text" id="itemcost" name="itemcost" placeholder="Eg: 20" required>
+    <input type="text" id="itemcost" name="itemcost" placeholder="Eg: 20" required><br>
 
     <label for="Comments">Comments/Keywords</label>
     <input type="text" id="itemcom" name="itemcom" placeholder="Brand name/Extra details"><br>
