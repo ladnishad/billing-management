@@ -4,6 +4,10 @@ $username = "";
 $pwd = "";
 $dbname = "";
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
 $conn = new mysqli($servername,$username,$pwd,$dbname);
 if($conn->connect_error){
 	die("Connection failed. Issue : ".$conn->connect_error);
@@ -144,9 +148,8 @@ if($conn->connect_error){
 				}
 			</script>
 
-			<label for="userselect" id="userselect" style="display: none">Select User(s): </label>
-
-			<input type="submit" name="submitPrivate" value="Add to bill" class="button"><br>
+			<input type="submit" name="submitPrivate" value="Add to bill" class="button"><br><br>
+			<label for="userselect" id="userselect" style="display: none">Select User(s): </label><br>
 
 
 			</form>
@@ -182,19 +185,20 @@ if (isset($_POST['submitBill'])) {
 		exit();
 	}
 }
+
 if (isset($_POST['submitPrivate'])) {
 	// code...
 	$ItemName = (isset($_POST['itemlistText']) ? $_POST['itemlistText'] : null);
 	$NameItem = $_POST['itemlistText'];
 	$ItemQuantity = $_POST['usersQuant'];
 
-	$date = date('m/d/y');
+	$date = date('m/d/yG');
 	function convert($date)
 	{
 	  return str_replace("/", "", $date);
 	}
 
-	$cleanDate = convert($date);
+	$cleanDate = convert($date)."323";
 
 	$GetTotalCostQuery = "SELECT ItemCost FROM items where ItemName = '$ItemName'";
 	$GetTotalCost = mysqli_query($conn,$GetTotalCostQuery);
@@ -306,87 +310,75 @@ if (isset($_POST['submitPrivate'])) {
 	else{
 
 	}
-	?>
-
-	<table class="center" style="table-layout:fixed;width:1000px;" id="Costs">
-			<thead>
-			<tr>
-						<th scope="col">Bill#</th>
-						<th scope="col" colspan="2">Item</th>
-						<th scope="col">Harshit</th>
-						<th scope="col">Harish</th>
-						<th scope="col">Deep</th>
-						<th scope="col">Nishad</th>
-						<th scope="col">Qty</th>
-						<th scope="col">Total Cost</th>
-				</tr>
-				</thead>
-				<tbody>
-				<?php
-				$retrieveBill = "SELECT BillsID, BillItem, HarshitCost, HarishCost, DeepCost, NishadCost,TotalQty,TotalCost FROM Bills";
-				$billsresult = mysqli_query($conn,$retrieveBill);
-				$num_rows = mysqli_num_rows($billsresult);
-
-					while ($row = mysqli_fetch_array($billsresult)):; ?>
-					<tr>
-						<td class="item-id"><?php echo $row['BillsID'];?></td>
-						<td colspan="2"><strong class="item-name"><?php echo $row['BillItem'];?></strong></td>
-						<td class="item-price"><?php echo "$".$row['HarshitCost'];?></td>
-						<td class="item-price"><?php echo "$".$row['HarishCost'];?></td>
-						<td class="item-price"><?php echo "$".$row['DeepCost'];?></td>
-						<td class="item-price"><?php echo "$".$row['NishadCost'];?></td>
-						<td class="item-price"><?php echo $row['TotalQty'];?></td>
-						<td class="item-price"><?php echo "$".$row['TotalCost'];?></td>
-					</tr>
-				<?php endwhile; ?>
-				</tbody>
-			</table>
-
-			<table class="center" style="table-layout:fixed;width:1000px;" id="Totals">
-				<tbody>
-					<?php
-					$retrieveTotals = "SELECT SUM(HarshitCost) as HarshitTotal, SUM(HarishCost) as HarishTotal, SUM(DeepCost) as DeepTotal, SUM(NishadCost) as NishadTotal, SUM(TotalCost) as Total FROM Bills";
-					$totalsresult = mysqli_query($conn,$retrieveTotals);
-					$num_rows = mysqli_num_rows($totalsresult);
-
-						while ($row = mysqli_fetch_array($totalsresult)):; ?>
-					<tr>
-						<td colspan="3"><strong class="item-name"><?php echo "Total";?></strong></td>
-						<td class="item-price"><strong><?php echo "$".$row['HarshitTotal'];?></strong></td>
-						<td class="item-price"><strong><?php echo "$".$row['HarishTotal'];?></strong></td>
-						<td class="item-price"><strong><?php echo "$".$row['DeepTotal'];?></strong></td>
-						<td class="item-price"><strong><?php echo "$".$row['NishadTotal'];?></strong></td>
-						<td colspan="2" class="item-price"><strong><?php echo "$".$row['Total'];?></strong></td>
-					</tr>
-
-				<?php endwhile; ?>
-				</tbody>
-			</table>
-
-			<div class="btn_center">
-			<form action ="index.php" method="post">
-					<input type="submit" name="submitBill" id="submitBillButton" value="Submit Bill" class="button">
-					<input type="submit" name="deleteBill" id="deleteBillButton" value="Clear Bill" class="button">
-					<input type="button" name="PrintBill" id="PrintBillButton" value="Print Bill" class="button" onclick="createPDF()">
-			</form>
-			</div>
+}
 
 
-<?php } ?>
+if (isset($_POST['PrintBill'])){
 
-<?php
+	require '../phpmailer/src/Exception.php';
+	require '../phpmailer/src/PHPMailer.php';
+	require '../phpmailer/src/SMTP.php';
+	//require '../phpmailer/PHPMailerAutoload.php';
+	$mail = new PHPMailer(true);
+	$mail->Host = "smtp.gmail.com";
+	$mail->isSMTP();
+	$mail->SMTPAuth = true;
+	$mail->Username = "abc@gmail.com";
+	$mail->Password = "XXXXXXXX!";
+
+	$mail->SMTPSecure = "tls";
+
+	$mail->Port = 587;
+
+	$retrieveTotals = "SELECT BillsID,SUM(HarshitCost) as HarshitTotal, SUM(HarishCost) as HarishTotal, SUM(DeepCost) as DeepTotal, SUM(NishadCost) as NishadTotal, SUM(TotalCost) as Total FROM Bills";
+				$totalsresult = mysqli_query($conn,$retrieveTotals);
+				$num_rows = mysqli_num_rows($totalsresult);
+				$BillIDforEmail = '';
+				$HarshitTotalForEmail = '';
+				$HarishTotalForEmail = '';
+				$NishadTotalForEmail = '';
+
+				while ($row = mysqli_fetch_array($totalsresult)):;
+
+				$BillIDforEmail = $row['BillsID'];
+				$HarshitTotalForEmail = $row['HarshitTotal'];
+				$HarishTotalForEmail = $row['HarishTotal'];
+				$DeepTotalForEmail = $row['DeepTotal'];
+				$NishadTotalForEmail = $row['NishadTotal'];
+
+				 endwhile;
+
+	$mail->Subject = "Bill Details For Bill ID: ".$BillIDforEmail;
+
+	$mail->Body = "Harshit: $".$HarshitTotalForEmail."\nHarish: $".$HarishTotalForEmail."\nDeep: $".$DeepTotalForEmail."\nNishad: $".$NishadTotalForEmail."\n";
+
+	$mail->setFrom('abc@gmail.com','abc');
+	$mail->addAddress('abc@gmail.com');
+	$mail->addAddress('def@gmail.com');
+	$mail->addAddress('ghi@gmail.com');
+	$mail->addAddress('jkl@gmail.com');
+
+	if ($mail->send()) {
+		echo '<script language="javascript">';
+		echo 'alert("Email sent successfully.")';
+		echo '</script>';
+	}
+	else {
+		echo "Failed";
+	}
+}
 if (isset($_POST['submitCommon'])) {
 	$ItemName = (isset($_POST['itemlistText']) ? $_POST['itemlistText'] : null);
 	$NameItem = $_POST['itemlistText'];
 	$ItemQuantity = $_POST['quantity'];
 
-	$date = date('m/d/y');
+	$date = date('m/d/yG');
 	function convert($date)
 	{
 	  return str_replace("/", "", $date);
 	}
 
-	$cleanDate = convert($date);
+	$cleanDate = convert($date)."323";
 
 	$commGetTotalCostQuery = "SELECT ItemCost FROM items where ItemName = '$ItemName'";
 	$commGetTotalCost = mysqli_query($conn,$commGetTotalCostQuery);
@@ -408,6 +400,8 @@ if (isset($_POST['submitCommon'])) {
 	if (!$execCommQuery) {
     printf("Error: %s\n", mysqli_error($conn));
     exit();
+}
+
 }
 ?>
 
@@ -470,16 +464,8 @@ if (isset($_POST['submitCommon'])) {
 		<form action ="index.php" method="post">
 				<input type="submit" name="submitBill" id="submitBillButton" value="Submit Bill" class="button">
 				<input type="submit" name="deleteBill" id="deleteBillButton" value="Clear Bill" class="button">
-				<input type="button" name="PrintBill" id="PrintBillButton" value="Print Bill" class="button" onclick="createPDF()">
+				<input type="submit" name="PrintBill" id="PrintBillButton" value="Email Bill" class="button">
 		</form>
 		</div>
-
-<?php }
-?>
-
-
-
-
-
 	</body>
 </html>
